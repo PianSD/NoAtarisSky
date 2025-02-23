@@ -1,0 +1,176 @@
+<html>
+<head>
+  <title>No Atari's Sky</title>
+  <meta charset="UTF-8">
+  <style>
+    @font-face {
+      font-family: 'Product Sans Bold';
+      src: url('/Product Sans Bold.ttf') format('truetype');
+    }
+
+    body {
+      margin: 0;
+      background: #000;
+      font-family: 'Product Sans Bold', monospace;
+      overflow: hidden;
+      color: #fff;
+    }
+
+    canvas {
+      image-rendering: pixelated;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      z-index: 100;
+      transition: opacity 2s;
+    }
+
+    .title {
+      font-size: 48px;
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff;
+      text-align: center;
+    }
+
+    .help {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0,0,0,0.8);
+      padding: 20px;
+      border: 2px solid #0ff;
+      display: none;
+    }
+
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(transparent 50%, rgba(0, 0, 0, .5) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .crt {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 11;
+      animation: flicker 0.15s infinite;
+      opacity: 0.1;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.1; }
+      50% { opacity: 0.2; }
+      100% { opacity: 0.1; }
+    }
+
+    .game-controls {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+
+    .control-btn {
+      background: #000;
+      color: #0ff;
+      border: 2px solid #0ff;
+      padding: 10px 20px;
+      margin: 5px;
+      font-family: 'Product Sans Bold';
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .control-btn:hover {
+      background: #0ff;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="title">
+      NO ATARI'S SKY<br>
+      <small>By PianSweetDreamer</small><br>
+      <small style="font-size: 24px">Press SPACE to Start</small>
+    </div>
+  </div>
+
+  <div class="help">
+    CONTROLS:<br>
+    Arrow Keys - Pilot Ship<br>
+    P - Pulse Engine<br>
+    E - Scan<br>
+    L - Landing Mode<br>
+    M - Toggle Map<br>
+    H - Toggle Help<br>
+    Ctrl+S - Export Save<br>
+    Ctrl+O - Import Save<br>
+    Z - Hyperspace Jump (on map)<br>
+    SPACE - Launch/Land<br>
+    Mouse - Select Systems (on map)
+  </div>
+
+  <div class="game-controls">
+    <button id="muteBtn" class="control-btn"> Mute</button>
+  </div>
+
+  <canvas id="game"></canvas>
+  <div class="scanlines"></div>
+  <div class="crt"></div>
+
+  <script type="module">
+    // Main game code
+    import { Game } from './game.js';
+    import { AudioManager } from './audio.js';
+    import { generatePlanet } from './planet.js';
+    import { Ship } from './ship.js';
+
+    // Wait for fonts to load before creating game
+    document.fonts.ready.then(() => {
+      const canvas = document.querySelector('canvas');
+      canvas.width = 1024;
+      canvas.height = 768;
+
+      const game = new Game(canvas);
+
+      // Game is already playing music from constructor
+      
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space' && !game.started) {
+          document.querySelector('.overlay').style.opacity = 0;
+          setTimeout(() => {
+            document.querySelector('.overlay').style.display = 'none';
+            game.start();
+          }, 2000);
+        }
+
+        if (e.code === 'KeyH') {
+          const help = document.querySelector('.help');
+          help.style.display = help.style.display === 'none' ? 'block' : 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
